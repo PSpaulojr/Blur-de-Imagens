@@ -1,0 +1,11 @@
+{
+    "files.associations": {
+        "imageprocessing.h": "c",
+        "unistd.h": "c",
+        "mman.h": "c",
+        "stdio.h": "c",
+        "stdlib.h": "c",
+        "types.h": "c"
+    },
+    "C_Cpp.dimInactiveRegions": false
+}
