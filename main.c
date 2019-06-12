@@ -58,7 +58,7 @@ int main(){
     int protection = PROT_READ | PROT_WRITE;
     int visibility = MAP_SHARED | MAP_ANON;
 
-    img = abrir_imagem("data/cachorro.jpg");
+    img = abrir_imagem("data/macaco2.jpg");
 
     r = (float*) mmap(NULL, (img.width * img.height)*sizeof(float), protection, visibility, 0, 0);
     g = (float*) mmap(NULL, (img.width * img.height)*sizeof(float), protection, visibility, 0, 0);
@@ -75,7 +75,7 @@ int main(){
     if( (img.width) > 600){
         raio_kernel  = 10;
     }
-    else raio_kernel = 3; 
+    else raio_kernel = 10; 
 
 
 
