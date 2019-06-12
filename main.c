@@ -9,48 +9,46 @@
 #define N_PROCESSOS  3
 
 
-void avaliar_vizinhanca_red(int k, int z, imagem *img, imagem img2, int N){
+void avaliar_vizinhanca_red(int k, int z, float *r, imagem img, int N){
   float soma=0; 
   int i, j;
   for(i = (k-N); i < (k+N); i++){
     for(j = (z-N); j < (z+N); j++){
-      soma += img2.r[j*(img2.width) + i];
+      soma += img.r[j*(img.width) + i];
     }
   }
   soma /= 2*N*2*N;
-  (img->r)[z*(img2.width) + k] = soma;
-  //printf("img2 -> r = %f\n", img2.r[z*(img->width) + k] );
-  //printf("img -> r = %f\n", img->r[z*(img->width) + k] );
+  r[z*(img.width) + k] = soma;
 }
 
-void avaliar_vizinhanca_blue(int k, int z, imagem *img, imagem img2, int N){
-  float soma= 0; 
+void avaliar_vizinhanca_blue(int k, int z, float *b, imagem img, int N){
+  float soma=0; 
   int i, j;
   for(i = (k-N); i < (k+N); i++){
     for(j = (z-N); j < (z+N); j++){
-      soma += img2.b[j*(img2.width) + i];
+      soma += img.b[j*(img.width) + i];
     }
   }
   soma /= 2*N*2*N;
-  (img->b)[z*(img2.width) + k] = soma;
+  b[z*(img.width) + k] = soma;
 }
 
-void avaliar_vizinhanca_green(int k, int z, imagem *img, imagem img2, int N){
-  float soma = 0; 
+void avaliar_vizinhanca_green(int k, int z, float *g, imagem img, int N){
+  float soma=0; 
   int i, j;
   for(i = (k-N); i < (k+N); i++){
     for(j = (z-N); j < (z+N); j++){
-      soma += img2.g[j*(img2.width) + i];
+      soma += img.g[j*(img.width) + i];
     }
   }
   soma /= 2*N*2*N;
-  (img->g)[z*(img2.width) + k] = soma;
+  g[z*(img.width) + k] = soma;
 }
 
 int main(){
 
     imagem img;
-    imagem *img2;
+    float *r, *g, *b;
 
     
     int nucleo;
@@ -60,18 +58,20 @@ int main(){
     int protection = PROT_READ | PROT_WRITE;
     int visibility = MAP_SHARED | MAP_ANON;
 
-    img2 = (imagem*) mmap(NULL, sizeof(imagem), protection, visibility, 0, 0);
     img = abrir_imagem("data/cachorro.jpg");
 
-    img2->width = img.width;
-    img2->height = img.height;
+    r = (float*) mmap(NULL, (img.width * img.height)*sizeof(float), protection, visibility, 0, 0);
+    g = (float*) mmap(NULL, (img.width * img.height)*sizeof(float), protection, visibility, 0, 0);
+    b = (float*) mmap(NULL, (img.width * img.height)*sizeof(float), protection, visibility, 0, 0);
 
-   /* printf("img.width = %d\n", img.width );
-    printf("img3 -> width = %d\n", img3->width );
-    printf("img.r[j*(img.r) + i] = %f\n", img.r[50*(img2.width) + 50] );
-    printf("img3->r[j*(img3->r) + i] = %f\n", img3->r[50*(img.width) + 50] );  */
-    
-
+    for(int i = 0; i < img.width; i++){
+      for(int j = 0; j < img.height; j++){
+        r[j*img.width + i] = img.r[j*img.width + i];
+        //printf("Up\n");
+        g[j*img.width + i] = img.g[j*img.width + i];
+        b[j*img.width + i] = img.b[j*img.width + i];
+      }
+    }
 
     if( (img.width) > 600){
         nucleo = 10;
@@ -95,9 +95,9 @@ int main(){
             for (int i = k; i<(img.width); i += 3) {
                 for (int j = 0; j<(img.height); j++) {
                     if( (i >= nucleo) && (j >= nucleo) && ( (img.width) - i > nucleo) && ( (img.height) - j > nucleo) ){
-                        avaliar_vizinhanca_red(i, j, img2, img, nucleo);
-                        avaliar_vizinhanca_blue(i, j, img2, img, nucleo);
-                        avaliar_vizinhanca_green(i, j, img2, img, nucleo);
+                        avaliar_vizinhanca_red(i, j, r, img, nucleo);
+                        avaliar_vizinhanca_blue(i, j, b, img, nucleo);
+                        avaliar_vizinhanca_green(i, j, g, img, nucleo);
                     }
                 }
             }
@@ -109,12 +109,17 @@ int main(){
     for (int k = 0; k < N_PROCESSOS ; k++){
         waitpid (filho[k], NULL, 0);
     }
-    printf("img3->r[j*(img3->r) + i] = %f\n", img3->r[50*(img.width) + 50] );
-    img = (*img3);
+
+    for(int i = 0; i < img.width; i++){
+      for(int j = 0; j < img.height; j++){
+        img.r[j*img.width + i] = r[j*img.width + i];
+        img.g[j*img.width + i] = g[j*img.width + i];
+        img.b[j*img.width + i] = b[j*img.width + i];
+      }
+    }
 
     salvar_imagem("cachorro-out.jpg", &img);
     liberar_imagem(&img);
-    liberar_imagem(&img2);
     
     return 0;
 }
