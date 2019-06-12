@@ -17,7 +17,7 @@ void avaliar_vizinhanca_red(int k, int z, float *r, imagem img, int N){
       soma += img.r[j*(img.width) + i];
     }
   }
-  soma /= 2*N*2*N;
+  soma /= ( (2*(N+1)) * (2*(N+1) ) -1 );
   r[z*(img.width) + k] = soma;
 }
 
@@ -29,7 +29,7 @@ void avaliar_vizinhanca_blue(int k, int z, float *b, imagem img, int N){
       soma += img.b[j*(img.width) + i];
     }
   }
-  soma /= 2*N*2*N;
+  soma /= ( (2*(N+1)) * (2*(N+1) ) -1 );
   b[z*(img.width) + k] = soma;
 }
 
@@ -41,7 +41,7 @@ void avaliar_vizinhanca_green(int k, int z, float *g, imagem img, int N){
       soma += img.g[j*(img.width) + i];
     }
   }
-  soma /= 2*N*2*N;
+  soma /= ( (2*(N+1)) * (2*(N+1) ) -1 );
   g[z*(img.width) + k] = soma;
 }
 
@@ -51,7 +51,7 @@ int main(){
     float *r, *g, *b;
 
     
-    int nucleo;
+    int raio_kernel;
 
     pid_t filho[N_PROCESSOS];
 
@@ -67,18 +67,16 @@ int main(){
     for(int i = 0; i < img.width; i++){
       for(int j = 0; j < img.height; j++){
         r[j*img.width + i] = img.r[j*img.width + i];
-        //printf("Up\n");
         g[j*img.width + i] = img.g[j*img.width + i];
         b[j*img.width + i] = img.b[j*img.width + i];
       }
     }
 
     if( (img.width) > 600){
-        nucleo = 10;
+        raio_kernel  = 10;
     }
-    else nucleo = 3; 
+    else raio_kernel = 3; 
 
-    printf("Nucleo é: %d\n",nucleo);
 
 
     /*Criar processos filhos*/
@@ -89,15 +87,14 @@ int main(){
         if (filho[k]==0) {
 
             /* Processo filho(k) Opera */ 
-            printf("Filho[%d]\n", k);
             int i, j;
 
             for (int i = k; i<(img.width); i += 3) {
                 for (int j = 0; j<(img.height); j++) {
-                    if( (i >= nucleo) && (j >= nucleo) && ( (img.width) - i > nucleo) && ( (img.height) - j > nucleo) ){
-                        avaliar_vizinhanca_red(i, j, r, img, nucleo);
-                        avaliar_vizinhanca_blue(i, j, b, img, nucleo);
-                        avaliar_vizinhanca_green(i, j, g, img, nucleo);
+                    if( (i >= raio_kernel) && (j >= raio_kernel) && ( (img.width) - i > raio_kernel) && ( (img.height) - j > raio_kernel) ){
+                        avaliar_vizinhanca_red(i, j, r, img, raio_kernel);
+                        avaliar_vizinhanca_blue(i, j, b, img, raio_kernel);
+                        avaliar_vizinhanca_green(i, j, g, img, raio_kernel);
                     }
                 }
             }

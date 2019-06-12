@@ -51,7 +51,7 @@ int main(){
     float *r, *g, *b;
 
     
-    int nucleo;
+    int raio_kernel;
 
     pid_t filho[N_PROCESSOS];
 
@@ -73,11 +73,10 @@ int main(){
     }
 
     if( (img.width) > 600){
-        nucleo = 10;
+        raio_kernel  = 10;
     }
-    else nucleo = 3; 
+    else raio_kernel = 3; 
 
-    printf("Nucleo é: %d\n",nucleo);
 
 
     /*Criar processos filhos*/
@@ -88,15 +87,14 @@ int main(){
         if (filho[k]==0) {
 
             /* Processo filho(k) Opera */ 
-            printf("Filho[%d]\n", k);
             int i, j;
 
             for (int i = k; i<(img.width); i += 3) {
                 for (int j = 0; j<(img.height); j++) {
-                    if( (i >= nucleo) && (j >= nucleo) && ( (img.width) - i > nucleo) && ( (img.height) - j > nucleo) ){
-                        avaliar_vizinhanca_red(i, j, r, img, nucleo);
-                        avaliar_vizinhanca_blue(i, j, b, img, nucleo);
-                        avaliar_vizinhanca_green(i, j, g, img, nucleo);
+                    if( (i >= raio_kernel) && (j >= raio_kernel) && ( (img.width) - i > raio_kernel) && ( (img.height) - j > raio_kernel) ){
+                        avaliar_vizinhanca_red(i, j, r, img, raio_kernel);
+                        avaliar_vizinhanca_blue(i, j, b, img, raio_kernel);
+                        avaliar_vizinhanca_green(i, j, g, img, raio_kernel);
                     }
                 }
             }
